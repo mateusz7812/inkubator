@@ -47,9 +47,9 @@
             "includePath": [
                 "C:\\Users\\HP Envy\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.3\\cores\\arduino",
                 "C:\\Users\\HP Envy\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.3\\variants\\eightanaloginputs",
-                "C:\\Program Files (x86)\\Arduino\\libraries\\Servo\\src",
                 "C:\\Users\\HP Envy\\Documents\\Arduino\\libraries\\DS1302RTC",
                 "C:\\Users\\HP Envy\\Documents\\Arduino\\libraries\\Time",
+                "C:\\Program Files (x86)\\Arduino\\libraries\\Servo\\src",
                 "C:\\Users\\HP Envy\\Documents\\Arduino\\libraries\\Adafruit_SSD1306-master",
                 "C:\\Users\\HP Envy\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library",
                 "C:\\Users\\HP Envy\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.3\\libraries\\SPI\\src",

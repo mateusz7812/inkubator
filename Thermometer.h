@@ -1,4 +1,7 @@
 
+#ifndef THERMOMETER
+
+#define THERMOMETER
 class Thermometer {
   private:
     int pin;
@@ -18,3 +21,4 @@ class Thermometer {
 
     double measure();
   };
+#endif
