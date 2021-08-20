@@ -38,7 +38,7 @@ void errorBlinking(int pin){
 
 void Reporter::reportError(String message){
   if(serialM != nullptr){
-      serialM->print(("Error: " + message).c_str());
+      serialM->print("Error: " + message);
   }
   if(display != nullptr){
       display->displayError(message);
@@ -50,6 +50,6 @@ void Reporter::reportError(String message){
 
 void Reporter::reportInfo(String message){
   if(serialM != nullptr){
-      serialM->print(("Info: " + message).c_str());
+      serialM->print("Info: " + message);
   }
 }

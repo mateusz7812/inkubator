@@ -1,9 +1,13 @@
+#ifndef CONTROLLER
+
+#define CONTROLLER
 #include "consts.h"
 #include "AbstractDisplay.h"
 #include "Thermometer.h"
 #include "Light.h"
 #include "MyServo.h"
 #include "SerialManager.h"
+#include "MyClock.h"
 
 
 class Controller{
@@ -29,3 +33,5 @@ class Controller{
     virtual void setup() = 0;
     virtual void process() = 0;
 };
+
+#endif

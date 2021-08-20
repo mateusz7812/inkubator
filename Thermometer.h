@@ -2,6 +2,8 @@
 #ifndef THERMOMETER
 
 #define THERMOMETER
+#include "Arduino.h"
+
 class Thermometer {
   private:
     int pin;
@@ -14,11 +16,14 @@ class Thermometer {
     double R = 0;
   public:
     Thermometer(int analog_pin){
+      pinMode(A1, OUTPUT);
+      digitalWrite(A1, LOW);
+      pinMode(A2, OUTPUT);
+      digitalWrite(A2, HIGH);
       pin = analog_pin;
     }
 
     double get_R();
-
     double measure();
   };
 #endif
