@@ -1,55 +1,92 @@
 #include "Reporter.h"
 #include <Arduino.h>
 
-void Reporter::setPin(int pin){
-    pinMode(pin, OUTPUT);
-    this->pin = pin;
+void Reporter::setPin(int pin)
+{
+  pinMode(pin, OUTPUT);
+  this->pin = pin;
 }
 
-void Reporter::setSerial(SerialManager * serial){
-    this->serialM = serial;
+void Reporter::setSerial(SerialManager *serial)
+{
+  this->serialM = serial;
 }
 
-void Reporter::setDisplay(AbstractDisplay * display){
-    this->display = display;
+void Reporter::setDisplay(AbstractDisplay *display)
+{
+  this->display = display;
 }
 
-void sendBlink(int s, int pin){
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(s);                       // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(300);  
+void Reporter::led_on()
+{
+  if (!led_state)
+  {
+    digitalWrite(LED_BUILTIN, HIGH);
+    led_state = true;
+  }
 }
 
-void sendThreeBlinks(int s, int pin){
-  for(int i = 0; i<3; i++){
+void Reporter::led_off()
+{
+  if (led_state)
+  {
+    digitalWrite(LED_BUILTIN, LOW);
+    led_state = false;
+  }
+}
+
+void Reporter::sendBlink(int s, int pin)
+{
+  led_on();
+  delay(s);
+  led_off();
+  delay(300);
+}
+
+void Reporter::sendThreeBlinks(int s, int pin)
+{
+  for (int i = 0; i < 3; i++)
+  {
     sendBlink(s, pin);
   }
 }
 
-void errorBlinking(int pin){
-  for(;;){
-   sendThreeBlinks(150, pin);
-   sendThreeBlinks(400, pin);
-   sendThreeBlinks(150, pin); 
-   delay(1000);  
+void Reporter::errorBlinking(int pin)
+{
+  for (int i = 0; i < 3; i++)
+  {
+    sendThreeBlinks(150, pin);
+    sendThreeBlinks(400, pin);
+    sendThreeBlinks(150, pin);
+    delay(1000);
   }
 }
 
-void Reporter::reportError(String message){
-  if(serialM != nullptr){
-      serialM->print("Error: " + message);
-  }
-  if(display != nullptr){
+void Reporter::reportError(char message[])
+{
+  while (true)
+  {
+    if (serialM != nullptr)
+    {
+      serialM->print("Error: ");
+      serialM->print(message);
+    }
+    if (display != nullptr)
+    {
       display->displayError(message);
-  }
-  if(pin != 0){
+    }
+    if (pin != 0)
+    {
       errorBlinking(pin);
+    }
   }
 }
 
-void Reporter::reportInfo(String message){
-  if(serialM != nullptr){
-      serialM->print("Info: " + message);
+void Reporter::reportInfo(char message[])
+{
+  if (serialM != nullptr)
+  {
+    serialM->print("Info: ");
+    serialM->print(message);
   }
 }

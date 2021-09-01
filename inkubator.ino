@@ -26,7 +26,7 @@ void setup(){
   serialM = new SerialManager();
   reporter->setSerial(serialM);
   
-  reporter->reportInfo(String("Display initialization ...\n"));
+  reporter->reportInfo("Display initialization ...\n");
   display = new Display(reporter);
   reporter->reportInfo("Display initialization done\n");
   reporter->setDisplay(display);
@@ -51,5 +51,4 @@ void setup(){
 
 void loop() { 
   controller->process();
-  delay(1000);
 }

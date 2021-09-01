@@ -9,6 +9,6 @@ class Display : public AbstractDisplay {
         Reporter * reporter;
     public:
         Display(Reporter * reporter);
-        void displayData(String temperature, String date) override;
-        void displayError(String message) override;        
+        void displayData(char temperature[], char date[], bool light_state, char maxc[]) override;
+        void displayError(char message[]) override;        
 };

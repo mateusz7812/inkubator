@@ -5,7 +5,7 @@
 
 class AbstractDisplay{
     public:
-        virtual void displayData(String temperature, String date) = 0;
-        virtual void displayError(String message) = 0;
+        virtual void displayData(char temperature[], char date[], bool light_state, char maxc[]) = 0;
+        virtual void displayError(char message[]) = 0;
 };
 #endif

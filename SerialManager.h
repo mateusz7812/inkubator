@@ -7,15 +7,15 @@
 class SerialManager{
     public:
         SerialManager(){
-            Serial.begin(9600);
+            //Serial.begin(9600);
         }
         
-        void print(String str){
-            Serial.print(str.c_str());
+        void print(char str[]){
+            //Serial.print(str.c_str());
         }
 
         float readFloat(){
-            return Serial.parseFloat();
+            return 0;//Serial.parseFloat();
         }
 
 };

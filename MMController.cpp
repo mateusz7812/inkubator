@@ -1,92 +1,205 @@
 #include "MMController.h"
 
-MMController::MMController(Thermometer* t, Light* l, MyServo* s, MyClock* c, AbstractDisplay* d, Reporter* r, SerialManager* m): Controller(t, l, s, c, d, r, m)
-{  
+MMController::MMController(Thermometer *t, Light *l, MyServo *s, MyClock *c, AbstractDisplay *d, Reporter *r, SerialManager *m) : Controller(t, l, s, c, d, r, m)
+{
     tmElements_t tm = myClock->read();
-    String text = text2digits(tm.Hour) + ':' + text2digits(tm.Minute) + ':' + text2digits(tm.Second) + " " + tm.Day + "/" + tm.Month + "/" + tmYearToCalendar(tm.Year);
-    power_on_time = text;
+    char date[30];
+    text2digits(date, tm.Hour);
+    strcat(date, ':');
+    text2digits(date, tm.Minute);
+    strcat(date, ':');
+    text2digits(date, tm.Second);
+    strcat(date, " ");
+    text2digits(date, tm.Day);
+    strcat(date, '/');
+    text2digits(date, tm.Month);
+    strcat(date, '/');
+    strcat(date, tmYearToCalendar(tm.Year));
+    strcpy(power_on_time, date);
     servo->move(1);
 }
 
-
-String MMController::text2digits(int number) {
-    String n = String(number);
+void MMController::text2digits(char str[], int number)
+{
     if (number >= 0 && number < 10)
-    n = String('0') + n;
-    return n;
+        str = strcat(str, '0');
+    sprintf(str, "%d", number);
 }
 
-void MMController::setup(){
-    delay(1000); 
-    Serial.print("Power on!\n");
-    
-    //myClock->setClockTime(0,51,14,16,8,2021);
-    //myClock->moveTime(-1);
+void MMController::setup()
+{
+    //myClock->setDateTime(__DATE__, __TIME__);
+    //myClock->moveTime(50);
+    C = thermometer->measure();
 }
 
-void MMController::process() {
-    temp = thermometer->measure();
-    C = (C + temp) / 2;
+void MMController::process()
+{
+    actual_time = millis();
 
-    tmElements_t tm = myClock->read();
-    String text = text2digits(tm.Hour) + ':' + text2digits(tm.Minute) + ':' + text2digits(tm.Second);
+    if (actual_time - thermometer_time >= temperature_measure_delay)
+    {
+        thermometer_time = actual_time;
+        measureTemperature();
+        saveMaxTemp();
+    }
 
-    saveMaxTemp();
-    display->displayData(String(C), text);
-    printData();
-    switchLight();
-    rotateEggs();
+    if (actual_time - display_time >= 1000UL)
+    {
+        display_time = actual_time;
+
+        tmElements_t tm = myClock->read();
+        char date[10];
+        text2digits(date, tm.Hour);
+        strcat(date, ':');
+        text2digits(date, tm.Minute);
+        strcat(date, ':');
+        text2digits(date, tm.Second);
+
+        char additional[15];
+        sprintf(additional, "%d", maxc);
+        strcat(additional, " ");
+        sprintf(additional, "%d", light_counter);
+        strcat(additional, " ");
+        sprintf(additional, "%d", freeMemory());
+
+        char temperature[10];
+        sprintf(temperature, "%d", C);
+        display->displayData(temperature, date, light_state, additional);
+    }
+
+    if (actual_time - light_time >= 1000UL)
+    {
+        light_time = actual_time;
+        switchLight();
+    }
+
+    if (actual_time - servo_time >= SERVO_STEP_DELAY)
+    {
+        servo_time = actual_time;
+        rotateEggs();
+    }
+
+    if (actual_time - led_time >= 1000UL)
+    {
+        led_time = actual_time;
+        reporter->led_on();
+    }
+    else if (actual_time - led_time >= 500UL)
+    {
+        reporter->led_off();
+    }
 }
 
-void MMController::switchLight(){
-    if(light_counter >= 10){
+void MMController::measureTemperature()
+{
+    double temp = thermometer->measure();
+    /*
+    if (light_state)
+    {
+        temp += 0.1;
+    }
+    else
+    {
+        temp -= 0.1;
+    }
+*/
+    C = ((AVERAGING_NUMBER * C) + temp) / (AVERAGING_NUMBER + 1);
+}
+
+void MMController::switchLight()
+{
+    if (light_counter >= 10)
+    {
         light_delay_flag = true;
     }
-    else if(light_counter <= 0){
+    else if (light_counter <= 0)
+    {
         light_delay_flag = false;
     }
 
-    if((!light_delay_flag) && (C < MIN_TEMPERATURE)){
+    if ((C > 0) && (C < 40) && (!light_delay_flag) && (C < MIN_TEMPERATURE))
+    {
         light->turn_on();
+        light_state = true;
         light_counter++;
     }
-    else if(light_delay_flag || (C > MAX_TEMPERATURE)){
+    else if (light_delay_flag || (C > MAX_TEMPERATURE))
+    {
         light->turn_off();
-        light_counter--;
+        light_state = false;
+        light_counter -= 0.4;
+        if (light_counter < 0)
+        {
+            light_counter = 0;
+        }
+    }
+    else if ((C >= MIN_TEMPERATURE) && (C <= MAX_TEMPERATURE))
+    {
+        //buffer zone
+    }
+    else
+    {
+        light->turn_off();
+        reporter->reportError("Temperature error!");
     }
 }
 
-void MMController::saveMaxTemp(){
-    if(C > maxc){
-    maxc = C;
+void MMController::saveMaxTemp()
+{
+    if (C > maxc)
+    {
+        maxc = C;
     }
-    else if (C < minc){
-    minc = C;
+    else if (C < minc)
+    {
+        minc = C;
     };
 }
 
-void MMController::rotateEggs(){
-    if(timeToRotate()){
-    servo->move(0);
-    }else{
-    servo->move(180);
+void MMController::rotateEggs()
+{
+    if (timeToRotate())
+    {
+        servo->take_step(0);
+    }
+    else
+    {
+        servo->take_step(180);
     }
 }
 
-bool MMController::timeToRotate(){
+bool MMController::timeToRotate()
+{
     tmElements_t tm = myClock->read();
-    return (tm.Hour+4) % 24 < 12;
+    return (tm.Hour + 4) % 24 < 12;
 }
 
-void MMController::printData(){
+void MMController::printData()
+{
     double resistance = thermometer->get_R();
-    String str = power_on_time + " " + C + " " + resistance + " " + maxc + " " + minc + " " + MAX_TEMPERATURE + " " + MIN_TEMPERATURE + " ";
+
+    char str[70];
+    strcat(str, power_on_time);
+    strcat(str, " ");
+    sprintf(str, "%d", C);
+    strcat(str, " ");
+    sprintf(str, "%d", resistance);
+    strcat(str, " ");
+    sprintf(str, "%d", maxc);
+    strcat(str, " ");
+    sprintf(str, "%d", minc);
+    strcat(str, " ");
+    sprintf(str, "%d", MAX_TEMPERATURE);
+    strcat(str, " ");
+    sprintf(str, "%d", MIN_TEMPERATURE);
+    strcat(str, " ");
+
     if (light->get_state())
-        str += "ON ";
+        strcat(str, "ON ");
     else
-        str += "OFF ";
-    str += String(serial->readFloat()) + "\n";
+        strcat(str, "OFF ");
+    sprintf(str, "%d", serial->readFloat());
+        strcat(str, "\n");
     reporter->reportInfo(str);
 }
-
-
