@@ -9,6 +9,6 @@ class Display : public AbstractDisplay {
         Reporter * reporter;
     public:
         Display(Reporter * reporter);
-        void displayData(char temperature[], char date[], bool light_state, char maxc[]) override;
+        void displayData(char temperature[], char additional[], bool light_state) override;
         void displayError(char message[]) override;        
 };

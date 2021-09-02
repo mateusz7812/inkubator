@@ -4,7 +4,7 @@ MMController::MMController(Thermometer *t, Light *l, MyServo *s, MyClock *c, Abs
 {
     tmElements_t tm = myClock->read();
     char date[30];
-    text2digits(date, tm.Hour);
+    /*text2digits(date, tm.Hour);
     strcat(date, ':');
     text2digits(date, tm.Minute);
     strcat(date, ':');
@@ -15,8 +15,7 @@ MMController::MMController(Thermometer *t, Light *l, MyServo *s, MyClock *c, Abs
     text2digits(date, tm.Month);
     strcat(date, '/');
     strcat(date, tmYearToCalendar(tm.Year));
-    strcpy(power_on_time, date);
-    servo->move(1);
+    strcpy(power_on_time, date);*/
 }
 
 void MMController::text2digits(char str[], int number)
@@ -49,23 +48,14 @@ void MMController::process()
         display_time = actual_time;
 
         tmElements_t tm = myClock->read();
-        char date[10];
-        text2digits(date, tm.Hour);
-        strcat(date, ':');
-        text2digits(date, tm.Minute);
-        strcat(date, ':');
-        text2digits(date, tm.Second);
+        char additional[128];
+        char maxc_str[5];
+        dtostrf(maxc, 0, 1, maxc_str);
+        sprintf(additional, "%02d:%02d:%02d %s %d %d", tm.Hour, tm.Minute, tm.Second, maxc_str, (int)light_counter, freeMemory());
 
-        char additional[15];
-        sprintf(additional, "%d", maxc);
-        strcat(additional, " ");
-        sprintf(additional, "%d", light_counter);
-        strcat(additional, " ");
-        sprintf(additional, "%d", freeMemory());
-
-        char temperature[10];
-        sprintf(temperature, "%d", C);
-        display->displayData(temperature, date, light_state, additional);
+        char temperature[5];
+        dtostrf(C, 0, 2, temperature);
+        display->displayData(temperature, additional, light_state);
     }
 
     if (actual_time - light_time >= 1000UL)
@@ -200,6 +190,6 @@ void MMController::printData()
     else
         strcat(str, "OFF ");
     sprintf(str, "%d", serial->readFloat());
-        strcat(str, "\n");
+    strcat(str, "\n");
     reporter->reportInfo(str);
 }

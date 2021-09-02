@@ -14,7 +14,7 @@ Display::Display(Reporter *reporter)
     display->cp437(true);
 }
 
-void Display::displayData(char temperature[], char date[], bool light_state, char maxc[])
+void Display::displayData(char temperature[], char additional[], bool light_state)
 {
     display->clearDisplay();
     display->setCursor(0, 0);
@@ -22,18 +22,14 @@ void Display::displayData(char temperature[], char date[], bool light_state, cha
     display->println(temperature);
 
     display->setTextSize(1);
-    display->println(date);
+    display->println(additional);
 
-    display->setCursor(90, 10);
+    display->setCursor(90, 2);
     display->setTextSize(2);
     if (light_state)
         display->print("ON");
     else
         display->print("OFF");
-
-    display->setCursor(50, 24);
-    display->setTextSize(1);
-    display->print(maxc);
 
     display->display();
 }
