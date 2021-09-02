@@ -50,7 +50,7 @@ void MMController::process()
         tmElements_t tm = myClock->read();
         char additional[128];
         char maxc_str[5];
-        dtostrf(maxc, 0, 1, maxc_str);
+        dtostrf(maxc, 0, 2, maxc_str);
         sprintf(additional, "%02d:%02d:%02d %s %d %d", tm.Hour, tm.Minute, tm.Second, maxc_str, (int)light_counter, freeMemory());
 
         char temperature[5];
@@ -168,9 +168,9 @@ bool MMController::timeToRotate()
 void MMController::printData()
 {
     double resistance = thermometer->get_R();
-
-    char str[70];
-    strcat(str, power_on_time);
+    
+    char str[70] = "formatting to do";
+    /*strcat(str, power_on_time);
     strcat(str, " ");
     sprintf(str, "%d", C);
     strcat(str, " ");
@@ -191,5 +191,6 @@ void MMController::printData()
         strcat(str, "OFF ");
     sprintf(str, "%d", serial->readFloat());
     strcat(str, "\n");
+    */
     reporter->reportInfo(str);
 }

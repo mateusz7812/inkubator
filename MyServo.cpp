@@ -1,11 +1,13 @@
 #include "MyServo.h"
 
-MyServo::MyServo(int servo_pin, float start_pos, float moving_difference)
+MyServo::MyServo(int servo_pin, float moving_difference, AbstractDataManager *data_manager)
 {
+    this->data_manager = data_manager;
+    cur_pos = data_manager->read(SERVO_POSITION_DATA_ADDRESS);
     pin = servo_pin;
-    cur_pos = start_pos;
     difference = moving_difference;
     servo_attached = false;
+    last_save = cur_pos;
 }
 
 void MyServo::move(float next_pos)
@@ -23,11 +25,20 @@ void MyServo::take_step(float next_pos)
         attach_servo();
         cur_pos += (difference * get_flag(next_pos));
         myservo.write(cur_pos);
-        delay(SERVO_STEP_DELAY);
+        save_position_if_required();
     }
     else
     {
         detach_servo();
+    }
+    
+}
+
+void MyServo::save_position_if_required(){
+    if (abs(cur_pos - last_save) > SAVING_SERVO_POSITION_DIFFERENCE)
+    {
+        data_manager->save((int)cur_pos, SERVO_POSITION_DATA_ADDRESS);
+        last_save = cur_pos;
     }
 }
 

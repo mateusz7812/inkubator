@@ -8,6 +8,7 @@
 #include "Controller.h"
 #include "SerialManager.h"
 #include "Display.h"
+#include "EepromManager.h"
 
 Thermometer * thermo;
 Light * light;
@@ -16,12 +17,14 @@ MyClock * myClock;
 SerialManager * serialM;
 AbstractDisplay * display;
 Reporter * reporter;
+AbstractDataManager * data_manager;
 
 Controller * controller;
 
 void setup(){
   
   reporter = new Reporter();
+  data_manager = new EepromManager(reporter);
 
   serialM = new SerialManager();
   reporter->setSerial(serialM);
@@ -31,13 +34,13 @@ void setup(){
   reporter->reportInfo("Display initialization done\n");
   reporter->setDisplay(display);
 
-  thermo = new Thermometer(analogPin);
+  thermo = new Thermometer(THERMOMETER_DATA_PIN);
   reporter->reportInfo("Thermometer initialization done\n");
   
-  light = new Light(relaypin);
+  light = new Light(RELAY_IN_PIN);
   reporter->reportInfo("Light initialization done\n");
   
-  servo = new MyServo(9, 0, 0.5);
+  servo = new MyServo(SERVO_DATA_PIN, SERVO_STEP_SIZE, data_manager);
   reporter->reportInfo("Servo initialization done\n");
   
   myClock = new MyClock(reporter);
