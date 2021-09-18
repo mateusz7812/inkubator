@@ -3,7 +3,7 @@
 Display::Display(Reporter *reporter)
 {
     this->reporter = reporter;
-    display = new Adafruit_SSD1306(128, 32, &Wire, 4);
+    display = new Adafruit_SSD1306(DISPLAY_WIDTH, DISPLAY_HEIGHT, &Wire, DISPLAY_PIN);
 
     if (!display->begin(SSD1306_SWITCHCAPVCC, 0x3C))
     {

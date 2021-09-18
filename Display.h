@@ -2,6 +2,7 @@
 #include <Adafruit_SSD1306.h>
 #include "Reporter.h"
 #include "AbstractDisplay.h"
+#include "consts.h"
 
 class Display : public AbstractDisplay {
     private:

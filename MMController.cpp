@@ -18,13 +18,6 @@ MMController::MMController(Thermometer *t, Light *l, MyServo *s, MyClock *c, Abs
     strcpy(power_on_time, date);*/
 }
 
-void MMController::text2digits(char str[], int number)
-{
-    if (number >= 0 && number < 10)
-        str = strcat(str, '0');
-    sprintf(str, "%d", number);
-}
-
 void MMController::setup()
 {
     //myClock->setDateTime(__DATE__, __TIME__);
@@ -58,7 +51,7 @@ void MMController::process()
         display->displayData(temperature, additional, light_state);
     }
 
-    if (actual_time - light_time >= 1000UL)
+    if (actual_time - light_time >= SWITCH_LIGHT_DELAY)
     {
         light_time = actual_time;
         switchLight();
@@ -84,16 +77,6 @@ void MMController::process()
 void MMController::measureTemperature()
 {
     double temp = thermometer->measure();
-    /*
-    if (light_state)
-    {
-        temp += 0.1;
-    }
-    else
-    {
-        temp -= 0.1;
-    }
-*/
     C = ((AVERAGING_NUMBER * C) + temp) / (AVERAGING_NUMBER + 1);
 }
 
@@ -118,7 +101,7 @@ void MMController::switchLight()
     {
         light->turn_off();
         light_state = false;
-        light_counter -= 0.4;
+        light_counter -= LIGHT_COUNTER_PENALTY;
         if (light_counter < 0)
         {
             light_counter = 0;

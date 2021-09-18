@@ -8,7 +8,7 @@ class Thermometer {
   private:
     int pin;
     int raw = 0;
-    double Vin = 5;
+    double Vin = 5.0;
     double Vout = 0;
     double R1 = 10000;
     double R2 = 0;

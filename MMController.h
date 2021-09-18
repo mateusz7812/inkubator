@@ -23,7 +23,6 @@ private:
   unsigned long servo_time = 0;
   unsigned long temperature_measure_delay = 1000UL / TEMPERATURE_MEASURES_ON_SECOND;
 
-  void text2digits(char str[], int number);
   void switchLight();
   void saveMaxTemp();
   void rotateEggs();
