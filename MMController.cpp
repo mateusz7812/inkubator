@@ -44,7 +44,7 @@ void MMController::process()
         char additional[128];
         char maxc_str[5];
         dtostrf(maxc, 0, 2, maxc_str);
-        sprintf(additional, "%02d:%02d:%02d %s %d %d", tm.Hour, tm.Minute, tm.Second, maxc_str, (int)light_counter, freeMemory());
+        sprintf(additional, "%02d:%02d:%02d %s", tm.Hour, tm.Minute, tm.Second, maxc_str);
 
         char temperature[5];
         dtostrf(C, 0, 2, temperature);
@@ -91,7 +91,7 @@ void MMController::switchLight()
         light_delay_flag = false;
     }
 
-    if ((C > 0) && (C < 40) && (!light_delay_flag) && (C < MIN_TEMPERATURE))
+    if ((C > 17) && (C < 40) && (!light_delay_flag) && (C < MIN_TEMPERATURE))
     {
         light->turn_on();
         light_state = true;
@@ -150,30 +150,24 @@ bool MMController::timeToRotate()
 
 void MMController::printData()
 {
-    double resistance = thermometer->get_R();
-    
-    char str[70] = "formatting to do";
-    /*strcat(str, power_on_time);
-    strcat(str, " ");
-    sprintf(str, "%d", C);
-    strcat(str, " ");
-    sprintf(str, "%d", resistance);
-    strcat(str, " ");
-    sprintf(str, "%d", maxc);
-    strcat(str, " ");
-    sprintf(str, "%d", minc);
-    strcat(str, " ");
-    sprintf(str, "%d", MAX_TEMPERATURE);
-    strcat(str, " ");
-    sprintf(str, "%d", MIN_TEMPERATURE);
-    strcat(str, " ");
+    /*
+    char resistance[10];
+    dtostrf(thermometer->get_R(), 10, 2, resistance);
 
+    char light_str[4];
     if (light->get_state())
-        strcat(str, "ON ");
+        light_str = "ON";
     else
-        strcat(str, "OFF ");
-    sprintf(str, "%d", serial->readFloat());
-    strcat(str, "\n");
-    */
-    reporter->reportInfo(str);
+        light_str = "OFF";
+
+    char read_temp[10];
+    dtostrf(serial->readFloat(), 10, 2, read_temp);
+
+    char C_str[10];
+    dtostrf(C, 10, 2, C_str);
+
+    char str[70];
+    sprintf(str, "%s| %s %s", power_on_time, C_str, resistance, maxc, minc, MAX_TEMPERATURE, MIN_TEMPERATURE, light_str, read_temp);
+
+    reporter->reportInfo(str);*/
 }

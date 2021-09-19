@@ -2,17 +2,24 @@
 #include <Arduino.h>
 
 double Thermometer::get_R(){
+    double R2;
+    double buffer;
+    int raw;
+    double Vout;
+
     raw = analogRead(pin);
     buffer = raw * Vin;
-    Vout = (buffer)/1024.0;
+    Vout = (buffer)/1023.0;
     buffer = (Vin/Vout) - 1;
     R2 = R1 * buffer;
     return R2;
 }
 
 double Thermometer::measure(){
-    R2 = get_R();
-    R = R2 / 1000;
-    R = 10-R;    
-    return 4.72 * R + 21;
+    double R = get_R();
+
+    double ln = log(R / R0);
+    double t =  (1 / ((ln / B) + (1 / T0)));
+    t -= 273.15; // from K to C
+    return t;
 }

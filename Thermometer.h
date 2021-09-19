@@ -7,13 +7,12 @@
 class Thermometer {
   private:
     int pin;
-    int raw = 0;
     double Vin = 5.0;
-    double Vout = 0;
     double R1 = 10000;
-    double R2 = 0;
-    double buffer = 0;
-    double R = 0;
+    double R0 = 10000;
+    double T0 = 25 + 273.15;
+    double B = 3179.57;
+
   public:
     Thermometer(int analog_pin){
       pinMode(A1, OUTPUT);

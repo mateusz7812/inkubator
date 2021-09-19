@@ -23,8 +23,8 @@ const int THERMOMETER_DATA_PIN = 0;
 const double MAX_TEMPERATURE = 37.35;
 const double MIN_TEMPERATURE = 37.30;
 
-const unsigned long TEMPERATURE_MEASURES_ON_SECOND = 10;
+const unsigned long TEMPERATURE_MEASURES_ON_SECOND = 20;
 
-const int AVERAGING_NUMBER = 100;
+const int AVERAGING_NUMBER = 200;
 
 #endif
